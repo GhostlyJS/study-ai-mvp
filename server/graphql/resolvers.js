@@ -42,19 +42,67 @@ const resolvers = {
         throw new AuthenticationError('Not authorized to access this document');
       }
       
-      return document;
+      // return all the document but change createdAt to string
+      return {
+        id: document._id.toString(),
+        title: document.title,
+        type: document.type,
+        youtubeUrl: document.youtubeUrl,
+        content: document.content,
+        owner: {
+          id: document.owner._id.toString(),
+          firstName: document.owner.firstName,
+          lastName: document.owner.lastName,
+        },
+        isPublic: document.isPublic,
+        createdAt: document.createdAt.toString(),
+      }
     },
     
     getMyDocuments: async (_, __, { user }) => {
       if (!user) {
         throw new AuthenticationError('You must be logged in!');
       }
+
+      var documents = await Document.find({ owner: user.id }).populate('owner').sort({ createdAt: -1 });
       
-      return await Document.find({ owner: user.id }).populate('owner').sort({ createdAt: -1 });
+      return documents.map(doc => {
+        return {
+          id: doc._id.toString(),
+          title: doc.title,
+          type: doc.type,
+          content: doc.content,
+          owner: {
+            id: doc.owner._id.toString(),
+            firstName: doc.owner.firstName,
+            lastName: doc.owner.lastName,
+          },
+          isPublic: doc.isPublic,
+          createdAt: doc.createdAt.toString(),
+        };
+      }
+      );
     },
     
     getPublicDocuments: async () => {
-      return await Document.find({ isPublic: true }).populate('owner').sort({ createdAt: -1 });
+      // Fetch all public documents
+      const documents = await Document.find({ isPublic: true }).populate('owner').sort({ createdAt: -1 });
+      
+      return documents.map(doc => {
+        return {
+          id: doc._id.toString(),
+          title: doc.title,
+          type: doc.type,
+          content: doc.content,
+          owner: {
+            id: doc.owner._id.toString(),
+            firstName: doc.owner.firstName,
+            lastName: doc.owner.lastName,
+          },
+          isPublic: doc.isPublic,
+          createdAt: doc.createdAt.toString(),
+        };
+      });
     },
     
     searchDocuments: async (_, { searchTerm }, { user }) => {

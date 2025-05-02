@@ -36,6 +36,8 @@ const Dashboard = () => {
   // Fetch documents
   const { loading: myDocsLoading, data: myDocsData } = useQuery(GET_MY_DOCUMENTS);
   const { loading: publicDocsLoading, data: publicDocsData } = useQuery(GET_PUBLIC_DOCUMENTS);
+
+  console.log('myDocsData', myDocsData);
   
   // Search documents
   const { loading: searchLoading, data: searchData, refetch: searchRefetch } = useQuery(SEARCH_DOCUMENTS, {
